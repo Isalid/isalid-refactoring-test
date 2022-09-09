@@ -7,9 +7,8 @@ use Isalid\Entity\Quote;
 use Isalid\Entity\Template;
 use Isalid\Repository\DestinationRepository;
 use Isalid\TemplateManager;
-use PHPUnit_Framework_TestCase;
 
-class TemplateManagerTest extends PHPUnit_Framework_TestCase
+class TemplateManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Init the mocks
@@ -32,9 +31,9 @@ class TemplateManagerTest extends PHPUnit_Framework_TestCase
     {
         $faker = \Faker\Factory::create();
 
-        $destinationId                  = $faker->randomNumber();
+        $destinationId = $faker->randomNumber();
         $expectedDestination = DestinationRepository::getInstance()->getById($destinationId);
-        $expectedUser        = ApplicationContext::getInstance()->getCurrentUser();
+        $expectedUser = ApplicationContext::getInstance()->getCurrentUser();
 
         $quote = new Quote($faker->randomNumber(), $faker->randomNumber(), $destinationId, $faker->date());
 
