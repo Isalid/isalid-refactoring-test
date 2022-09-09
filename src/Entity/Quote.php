@@ -17,13 +17,13 @@ class Quote
         $this->dateQuoted = $dateQuoted;
     }
 
-    public static function renderHtml(Quote $quote)
+    public function renderHtml()
     {
-        return '<p>' . $quote->id . '</p>';
+        return '<p>' . $this->id . '</p>';
     }
 
-    public static function renderText(Quote $quote)
+    public function renderText()
     {
-        return (string) $quote->id;
+        return (string) $this->id;
     }
 }

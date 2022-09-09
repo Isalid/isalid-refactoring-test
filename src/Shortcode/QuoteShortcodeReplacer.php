@@ -21,6 +21,14 @@ class QuoteShortcodeReplacer implements ShortcodeReplacer
             return $text;
         }
 
+        $text = $this->replaceDestination($text, $quote);
+        $text = $this->replaceSummary($text, $quote);
+
+        return $text;
+    }
+
+    private function replaceDestination($text, Quote $quote)
+    {
         $destination = DestinationRepository::getInstance()->getById($quote->destinationId);
 
         if (strpos($text, self::SHORTCODE_DESTINATION_NAME) !== false) {
@@ -32,12 +40,17 @@ class QuoteShortcodeReplacer implements ShortcodeReplacer
             $text = str_replace(self::SHORTCODE_DESTINATION_LINK, $site->url . '/' . $destination->countryName . '/quote/' . $quote->id, $text);
         }
 
+        return $text;
+    }
+
+    private function replaceSummary($text, Quote $quote)
+    {
         if (strpos($text, self::SHORTCODE_SUMMARY) !== false) {
-            $text = str_replace(self::SHORTCODE_SUMMARY, Quote::renderText($quote), $text);
+            $text = str_replace(self::SHORTCODE_SUMMARY, $quote->renderText(), $text);
         }
 
         if (strpos($text, self::SHORTCODE_SUMMARY_HTML) !== false) {
-            $text = str_replace(self::SHORTCODE_SUMMARY_HTML, Quote::renderHtml($quote), $text);
+            $text = str_replace(self::SHORTCODE_SUMMARY_HTML, $quote->renderHtml(), $text);
         }
 
         return $text;
