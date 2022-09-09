@@ -7,14 +7,19 @@ use Isalid\Entity\User;
 
 class UserShortcodeReplacer implements ShortcodeReplacer
 {
+    const SHORTCODE_USER_FIRSTNAME = '[user:first_name]';
+
     public function replace($text, array $data = [])
     {
-        $APPLICATION_CONTEXT = ApplicationContext::getInstance();
+        $context = ApplicationContext::getInstance();
 
-        $_user = (isset($data['user']) and ($data['user'] instanceof User)) ? $data['user'] : $APPLICATION_CONTEXT->getCurrentUser();
-        if ($_user) {
-            (strpos($text, '[user:first_name]') !== false) and $text = str_replace('[user:first_name]', ucfirst(mb_strtolower($_user->firstname)), $text);
+        $user = (isset($data['user']) and ($data['user'] instanceof User)) ? $data['user'] : $context->getCurrentUser();
+
+        if (!isset($user)) {
+            return $text;
         }
+
+        $text = str_replace(self::SHORTCODE_USER_FIRSTNAME, ucfirst(strtolower($user->firstname)), $text);
 
         return $text;
     }
