@@ -25,7 +25,6 @@ class QuoteShortcodeReplacer implements ShortcodeReplacer
             $containsSummaryHtml = strpos($text, '[quote:summary_html]');
             $containsSummary = strpos($text, '[quote:summary]');
 
-
             if ($containsSummaryHtml !== false || $containsSummary !== false) {
                 if ($containsSummaryHtml !== false) {
                     $text = str_replace(

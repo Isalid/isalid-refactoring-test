@@ -4,6 +4,7 @@ namespace Isalid\Tests\Shortcode;
 
 use Isalid\Entity\Quote;
 use Isalid\Repository\DestinationRepository;
+use Isalid\Repository\SiteRepository;
 use Isalid\Shortcode\QuoteShortcodeReplacer;
 
 class QuoteShortcodeReplacerTest extends \PHPUnit_Framework_TestCase
@@ -16,23 +17,52 @@ class QuoteShortcodeReplacerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->quoteShortcodeReplacer = new QuoteShortcodeReplacer();
-        $this->faker = \Faker\Factory::create();
     }
 
     /**
      * @test
+     * @dataProvider dataProvider
      */
-    public function test()
+    public function testQuoteShortcodes($quote, $template, $expectedText)
     {
-        $destinationId = $this->faker->randomNumber();
-        $expectedDestination = DestinationRepository::getInstance()->getById($destinationId);
-
-        $quote = new Quote($this->faker->randomNumber(), $this->faker->randomNumber(), $destinationId, $this->faker->date());
-        $text = "Texte random pour tester la destination : [quote:destination_name].";
-        $expectedText = "Texte random pour tester la destination : " . $expectedDestination->countryName . ".";
-        $result = $this->quoteShortcodeReplacer->replace($text, ['quote' => $quote]);
-
+        $result = $this->quoteShortcodeReplacer->replace($template, ['quote' => $quote]);
         $this->assertEquals($expectedText, $result);
+    }
+
+    public function dataProvider()
+    {
+        $faker = \Faker\Factory::create();
+
+        $quoteId = $faker->randomNumber();
+        $destinationId = $faker->randomNumber();
+        $expectedDestination = DestinationRepository::getInstance()->getById($destinationId);
+        $siteId = $faker->randomNumber();
+        $expectedSite = SiteRepository::getInstance()->getById($siteId);
+
+        $quote = new Quote($quoteId, $siteId, $destinationId, $faker->date());
+
+        return [
+            'quote:destination_name' => [
+                $quote,
+                'Texte random pour tester la destination : [quote:destination_name].',
+                'Texte random pour tester la destination : ' . $expectedDestination->countryName . '.'
+            ],
+            'quote:destination_link' => [
+                $quote,
+                'Texte avec [quote:destination_link].',
+                'Texte avec ' . $expectedSite->url . '/' . $expectedDestination->countryName . '/quote/' . $quoteId . '.',
+            ],
+            'quote:summary_html' => [
+                $quote,
+                '[quote:summary_html]',
+                '<p>'.$quoteId.'</p>'
+            ],
+            'quote:summary' => [
+                $quote,
+                '[quote:summary]',
+                $quoteId
+            ]
+        ];
     }
 
     //TODO ideas: test with empty data, inexisting destination, error in shortcodes, etc...
