@@ -1,5 +1,11 @@
 <?php
 
+namespace Isalid\Context;
+
+use Isalid\Entity\Site;
+use Isalid\Entity\User;
+use Isalid\Helper\SingletonTrait;
+
 class ApplicationContext
 {
     use SingletonTrait;

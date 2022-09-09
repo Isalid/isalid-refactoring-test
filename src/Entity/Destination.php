@@ -1,5 +1,7 @@
 <?php
 
+namespace Isalid\Entity;
+
 class Destination
 {
     public $id;

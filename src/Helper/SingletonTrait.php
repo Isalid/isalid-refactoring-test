@@ -1,5 +1,7 @@
 <?php
 
+namespace Isalid\Helper;
+
 trait SingletonTrait
 {
     /**

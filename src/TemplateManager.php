@@ -1,5 +1,14 @@
 <?php
 
+namespace Isalid;
+
+use Isalid\Context\ApplicationContext;
+use Isalid\Entity\Quote;
+use Isalid\Entity\Template;
+use Isalid\Repository\DestinationRepository;
+use Isalid\Repository\QuoteRepository;
+use Isalid\Repository\SiteRepository;
+
 class TemplateManager
 {
     public function getTemplateComputed(Template $tpl, array $data)

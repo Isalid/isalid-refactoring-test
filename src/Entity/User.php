@@ -1,5 +1,7 @@
 <?php
 
+namespace Isalid\Entity;
+
 class User
 {
     public $id;
