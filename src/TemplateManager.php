@@ -2,19 +2,27 @@
 
 namespace Isalid;
 
-use Isalid\Context\ApplicationContext;
-use Isalid\Entity\Quote;
 use Isalid\Entity\Template;
-use Isalid\Entity\User;
-use Isalid\Repository\DestinationRepository;
-use Isalid\Repository\QuoteRepository;
-use Isalid\Repository\SiteRepository;
 use Isalid\Shortcode\QuoteShortcodeReplacer;
 use Isalid\Shortcode\ShortcodeReplacer;
 use Isalid\Shortcode\UserShortcodeReplacer;
 
 class TemplateManager
 {
+    private $shortcodeReplacers = [];
+
+    public function __construct(array $shortcodeReplacers = [])
+    {
+        $this->shortcodeReplacers = $shortcodeReplacers;
+
+        if (count($shortcodeReplacers) === 0) {
+            $this->shortcodeReplacers = [
+                new QuoteShortcodeReplacer(),
+                new UserShortcodeReplacer()
+            ];
+        }
+    }
+
     public function getTemplateComputed(Template $tpl, array $data)
     {
         if (!$tpl) {
@@ -30,12 +38,7 @@ class TemplateManager
 
     private function computeText($text, array $data)
     {
-        $shortcodeReplacers = [
-            new QuoteShortcodeReplacer(),
-            new UserShortcodeReplacer()
-        ];
-
-        foreach ($shortcodeReplacers as $shortcodeReplacer) {
+        foreach ($this->shortcodeReplacers as $shortcodeReplacer) {
             /** @var ShortcodeReplacer $shortcodeReplacer */
             $text = $shortcodeReplacer->replace($text, $data);
         }

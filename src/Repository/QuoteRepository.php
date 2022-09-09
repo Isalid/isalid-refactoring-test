@@ -2,7 +2,6 @@
 
 namespace Isalid\Repository;
 
-use DateTime;
 use Isalid\Entity\Quote;
 use Isalid\Helper\SingletonTrait;
 
@@ -25,7 +24,7 @@ class QuoteRepository implements Repository
             $id,
             $generator->numberBetween(1, 10),
             $generator->numberBetween(1, 200),
-            new DateTime()
+            new \DateTime()
         );
     }
 }
