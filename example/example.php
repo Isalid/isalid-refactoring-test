@@ -1,21 +1,26 @@
 <?php
+namespace Example;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-require_once __DIR__ . '/../src/Entity/Destination.php';
-require_once __DIR__ . '/../src/Entity/Quote.php';
-require_once __DIR__ . '/../src/Entity/Site.php';
-require_once __DIR__ . '/../src/Entity/Template.php';
-require_once __DIR__ . '/../src/Entity/User.php';
-require_once __DIR__ . '/../src/Helper/SingletonTrait.php';
-require_once __DIR__ . '/../src/Context/ApplicationContext.php';
-require_once __DIR__ . '/../src/Repository/Repository.php';
-require_once __DIR__ . '/../src/Repository/DestinationRepository.php';
-require_once __DIR__ . '/../src/Repository/QuoteRepository.php';
-require_once __DIR__ . '/../src/Repository/SiteRepository.php';
-require_once __DIR__ . '/../src/TemplateManager.php';
+use App\Context\ApplicationContext;
+use App\Entity\Destination;
+use App\Entity\Quote;
+use App\Entity\Site;
+use App\Entity\Template;
+use App\Helper\TemplateHelper;
+use App\Repository\DestinationRepository;
+use App\Repository\QuoteRepository;
+use App\Repository\SiteRepository;
+use App\TemplateManager;
+use DateTime;
+use Faker\Factory;
 
-$faker = \Faker\Factory::create();
+$faker = Factory::create();
+
+$quoteRepository = new QuoteRepository();
+$siteRepository = new SiteRepository();
+$destinationRepository = new DestinationRepository();
 
 $template = new Template(
     1,
@@ -29,13 +34,22 @@ Bien cordialement,
 
 L'équipe de Shipper
 ");
-$templateManager = new TemplateManager();
+$templateManager = new TemplateManager(
+    new ApplicationContext(),
+    $quoteRepository, 
+    $siteRepository, 
+    $destinationRepository,
+    new TemplateHelper()
+);
+
+$site = $siteRepository->getById($faker->randomNumber());
+$destination = $destinationRepository->getById($faker->randomNumber());
 
 $message = $templateManager->getTemplateComputed(
     $template,
     [
-        'quote' => new Quote($faker->randomNumber(), $faker->randomNumber(), $faker->randomNumber(), $faker->date())
+        'quote' => new Quote($faker->randomNumber(), $site, $destination, new DateTime())
     ]
 );
 
-echo $message->subject . "\n" . $message->content;
+echo $message->getSubject() . "\n" . $message->getContent();

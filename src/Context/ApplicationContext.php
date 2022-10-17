@@ -1,19 +1,16 @@
 <?php
 
+namespace App\Context;
+
+use App\Entity\Site;
+use App\Entity\User;
+
 class ApplicationContext
 {
-    use SingletonTrait;
+    private Site $currentSite;
+    private User $currentUser;
 
-    /**
-     * @var Site
-     */
-    private $currentSite;
-    /**
-     * @var User
-     */
-    private $currentUser;
-
-    protected function __construct()
+    public function __construct()
     {
         $faker = \Faker\Factory::create();
         $this->currentSite = new Site($faker->randomNumber(), $faker->url);
