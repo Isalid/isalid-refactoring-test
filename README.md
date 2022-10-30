@@ -40,3 +40,22 @@ What do we expect from you:
  - a file / message / email explaining your process and principles you've followed
 
 **Good luck!**
+
+## My job
+
+### En français ça ira plus vite :
+
+- ajout de l'autoloading avec les namespace
+- passage en php 7.4 pour plus de typage
+- typage fort 
+- ajout de getter et setter
+- refacto de TemplateManager
+
+### TODO :
+- extraire les methodes computeSummary computeDestination, computeUser, computeSummaryHTML dans des classes avec une interface commune. Les injecter en dépendance du TemplateManager pour n'avoir besoin que de faire un compute sur chacune d'entre elles.
+- mettre les quotes `[quote:summary]` en CONSTANTE
+- faire les tests 
+
+### Après 1h 
+- j'ai dépassé le temps, j'ai mis un test, mais il en faudrait d'autres qui testent les fails, et testent le user et le html dans le message
+- j'ai relu la consigne pour voir si je ne m'étais pas trompé. J'ai du reverte quelques modifications sur TemplateManager::getTemplateComputed

@@ -1,73 +1,72 @@
 <?php
 
+namespace App;
+
+use App\Entity\Template;
+use App\Entity\User;
+use App\Entity\Quote;
+use App\Replacer\DestinationReplacer;
+use App\Replacer\SummaryHTMLReplacer;
+use App\Replacer\SummaryReplacer;
+use App\Replacer\UserReplacer;
+
 class TemplateManager
 {
-    public function getTemplateComputed(Template $tpl, array $data)
-    {
-        if (!$tpl) {
-            throw new \RuntimeException('no tpl given');
-        }
+    private $quote;
+    private $user;
+    private UserReplacer $userProcessor;
+    private DestinationReplacer $destinationReplacer;
+    private SummaryReplacer $summaryReplacer;
+    private SummaryHTMLReplacer $summaryHTMLReplacer;
 
-        $replaced = clone($tpl);
-        $replaced->subject = $this->computeText($replaced->subject, $data);
-        $replaced->content = $this->computeText($replaced->content, $data);
-
-        return $replaced;
+    public function __construct(
+        UserReplacer $userProcessor,
+        DestinationReplacer $destinationReplacer,
+        SummaryReplacer $summaryReplacer,
+        SummaryHTMLReplacer $summaryHTMLReplacer
+    ) {
+        $this->userProcessor = $userProcessor;
+        $this->destinationReplacer = $destinationReplacer;
+        $this->summaryReplacer = $summaryReplacer;
+        $this->summaryHTMLReplacer = $summaryHTMLReplacer;
     }
 
-    private function computeText($text, array $data)
+    public function getTemplateComputed(Template $tpl, array $data)
     {
-        $APPLICATION_CONTEXT = ApplicationContext::getInstance();
-
-        $quote = (isset($data['quote']) and $data['quote'] instanceof Quote) ? $data['quote'] : null;
-
-        if ($quote)
-        {
-            $_quoteFromRepository = QuoteRepository::getInstance()->getById($quote->id);
-            $usefulObject = SiteRepository::getInstance()->getById($quote->siteId);
-            $destinationOfQuote = DestinationRepository::getInstance()->getById($quote->destinationId);
-
-            if(strpos($text, '[quote:destination_link]') !== false){
-                $destination = DestinationRepository::getInstance()->getById($quote->destinationId);
-            }
-
-            $containsSummaryHtml = strpos($text, '[quote:summary_html]');
-            $containsSummary     = strpos($text, '[quote:summary]');
-
-            if ($containsSummaryHtml !== false || $containsSummary !== false) {
-                if ($containsSummaryHtml !== false) {
-                    $text = str_replace(
-                        '[quote:summary_html]',
-                        Quote::renderHtml($_quoteFromRepository),
-                        $text
-                    );
-                }
-                if ($containsSummary !== false) {
-                    $text = str_replace(
-                        '[quote:summary]',
-                        Quote::renderText($_quoteFromRepository),
-                        $text
-                    );
-                }
-            }
-
-            (strpos($text, '[quote:destination_name]') !== false) and $text = str_replace('[quote:destination_name]',$destinationOfQuote->countryName,$text);
+        $clonedTemplate = clone($tpl);
+        $quote = (isset($data['quote']) && $data['quote'] instanceof Quote) ? $data['quote'] : null;
+        $user = (isset($data['user']) && $data['user'] instanceof User) ? $data['user'] : null;
+        if (!$quote instanceof Quote) {
+            return $clonedTemplate;
         }
+        $this->quote = $quote;
+        $this->user = $user;
 
-        if (isset($destination))
-            $text = str_replace('[quote:destination_link]', $usefulObject->url . '/' . $destination->countryName . '/quote/' . $_quoteFromRepository->id, $text);
-        else
-            $text = str_replace('[quote:destination_link]', '', $text);
+        $this->processSubject($clonedTemplate);
+        $this->processContent($clonedTemplate);
 
-        /*
-         * USER
-         * [user:*]
-         */
-        $_user  = (isset($data['user'])  and ($data['user']  instanceof User))  ? $data['user']  : $APPLICATION_CONTEXT->getCurrentUser();
-        if($_user) {
-            (strpos($text, '[user:first_name]') !== false) and $text = str_replace('[user:first_name]'       , ucfirst(mb_strtolower($_user->firstname)), $text);
-        }
+        return $clonedTemplate;
+    }
 
-        return $text;
+    private function processSubject(Template $template): void
+    {
+        $subject = $template->getSubject();
+        $subject = $this->summaryHTMLReplacer->replace($subject, $this->quote);
+        $subject = $this->summaryReplacer->replace($subject, $this->quote);
+        $subject = $this->destinationReplacer->replace($subject, $this->quote);
+        $subject = $this->userProcessor->replace($subject, $this->user);
+
+        $template->setSubject($subject);
+    }
+
+    private function processContent(Template $template): void
+    {
+        $content = $template->getContent();
+        $content = $this->summaryHTMLReplacer->replace($content, $this->quote);
+        $content = $this->summaryReplacer->replace($content, $this->quote);
+        $content = $this->destinationReplacer->replace($content, $this->quote);
+        $content = $this->userProcessor->replace($content, $this->user);
+
+        $template->setContent($content);
     }
 }
