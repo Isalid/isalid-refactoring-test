@@ -7,8 +7,11 @@ class TemplateManager
     /**
      * @param AbstractTemplateProcessor[] $processors
      */
-    public function __construct(private array $processors)
+    private array $processors;
+
+    public function __construct(array $processors)
     {
+        $this->processors = $processors;
     }
 
     public function getTemplateComputed(Template $tpl, array $data): Template

@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 class QuoteProcessor extends AbstractTemplateProcessor
 {
+    private QuoteRepository $quoteRepository;
+    private SiteRepository $siteRepository;
+    private DestinationRepository $destinationRepository;
+
     public function __construct(
-        private QuoteRepository $quoteRepository,
-        private SiteRepository $siteRepository,
-        private DestinationRepository $destinationRepository,
+        QuoteRepository $quoteRepository,
+        SiteRepository $siteRepository,
+        DestinationRepository $destinationRepository
     ) {
+        $this->quoteRepository = $quoteRepository;
+        $this->siteRepository = $siteRepository;
+        $this->destinationRepository = $destinationRepository;
     }
 
-    public function process(string $text, mixed $entity): string
+    public function process(string $text, $entity): string
     {
         if (!$entity instanceof Quote) {
             $text = $this->replace($text, 'destination_link', '');

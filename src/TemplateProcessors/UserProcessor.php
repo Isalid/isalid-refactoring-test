@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 class UserProcessor extends AbstractTemplateProcessor
 {
-    public function process(string $text, mixed $entity): string
+    public function process(string $text, $entity): string
     {
         if (!$entity instanceof User) {
             return $text;

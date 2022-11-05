@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 abstract class AbstractTemplateProcessor
 {
-    abstract public function process(string $text, mixed $entity): string;
+    abstract public function process(string $text, $entity): string;
 
     abstract protected function getPrefix(): string;
 
-    protected function replace(string $text, string $placeholderKey, mixed $value): string
+    protected function replace(string $text, string $placeholderKey, $value): string
     {
         return str_replace($this->buildPlaceholder($placeholderKey), $value, $text);
     }
