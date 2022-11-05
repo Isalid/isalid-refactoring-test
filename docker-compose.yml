@@ -1,0 +1,8 @@
+version: "3"
+services:
+    php:
+        image: composer:2.0.8
+        restart: always
+        volumes:
+            - ./:/var/app/
+        working_dir: /var/app/

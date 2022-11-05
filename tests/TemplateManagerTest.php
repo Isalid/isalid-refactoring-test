@@ -12,6 +12,9 @@ require_once __DIR__ . '/../src/Repository/DestinationRepository.php';
 require_once __DIR__ . '/../src/Repository/QuoteRepository.php';
 require_once __DIR__ . '/../src/Repository/SiteRepository.php';
 require_once __DIR__ . '/../src/TemplateManager.php';
+require_once __DIR__ . '/../src/TemplateProcessors/AbstractTemplateProcessor.php';
+require_once __DIR__ . '/../src/TemplateProcessors/QuoteProcessor.php';
+require_once __DIR__ . '/../src/TemplateProcessors/UserProcessor.php';
 
 class TemplateManagerTest extends PHPUnit_Framework_TestCase
 {
@@ -36,7 +39,7 @@ class TemplateManagerTest extends PHPUnit_Framework_TestCase
     {
         $faker = \Faker\Factory::create();
 
-        $destinationId                  = $faker->randomNumber();
+        $destinationId       = $faker->randomNumber();
         $expectedDestination = DestinationRepository::getInstance()->getById($destinationId);
         $expectedUser        = ApplicationContext::getInstance()->getCurrentUser();
 
@@ -54,7 +57,15 @@ Bien cordialement,
 
 L'équipe de Shipper
 ");
-        $templateManager = new TemplateManager();
+        $processors = [
+            new QuoteProcessor(
+                QuoteRepository::getInstance(),
+                SiteRepository::getInstance(),
+                DestinationRepository::getInstance(),
+            ),
+            new UserProcessor(),
+        ];
+        $templateManager = new TemplateManager($processors);
 
         $message = $templateManager->getTemplateComputed(
             $template,

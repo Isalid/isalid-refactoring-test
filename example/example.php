@@ -14,6 +14,9 @@ require_once __DIR__ . '/../src/Repository/DestinationRepository.php';
 require_once __DIR__ . '/../src/Repository/QuoteRepository.php';
 require_once __DIR__ . '/../src/Repository/SiteRepository.php';
 require_once __DIR__ . '/../src/TemplateManager.php';
+require_once __DIR__ . '/../src/TemplateProcessors/AbstractTemplateProcessor.php';
+require_once __DIR__ . '/../src/TemplateProcessors/QuoteProcessor.php';
+require_once __DIR__ . '/../src/TemplateProcessors/UserProcessor.php';
 
 $faker = \Faker\Factory::create();
 
@@ -29,7 +32,15 @@ Bien cordialement,
 
 L'équipe de Shipper
 ");
-$templateManager = new TemplateManager();
+$processors = [
+    new QuoteProcessor(
+        QuoteRepository::getInstance(),
+        SiteRepository::getInstance(),
+        DestinationRepository::getInstance(),
+    ),
+    new UserProcessor(),
+];
+$templateManager = new TemplateManager($processors);
 
 $message = $templateManager->getTemplateComputed(
     $template,
