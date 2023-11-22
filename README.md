@@ -1,5 +1,9 @@
 # Refactoring Kata Test
 
+## EDIT
+
+Diff in readme to see what can be selected for automatic changelog.
+
 ## Introduction
 
 Let's say we are a company specialized in merchandise transport in different countries, and we have some message templates we want to send
